@@ -1511,6 +1511,8 @@ Editor.prototype.render = function(el) {
 
     this.codemirror = CodeMirror.fromTextArea(el, {
         mode: mode,
+        inputStyle: 'contenteditable',
+        spellcheck: Boolean(options.spellCheck),
         theme: 'paper',
         tabSize: options.tabSize != undefined ? options.tabSize : 2,
         indentUnit: options.tabSize != undefined ? options.tabSize : 2,
