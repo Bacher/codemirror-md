@@ -1,0 +1,49 @@
+{
+  "name": "codemirror-md",
+  "version": "0.1.0",
+  "description": "Codemirror Markdown editor",
+  "keywords": [
+    "codemirror",
+    "embeddable",
+    "markdown",
+    "editor",
+    "javascript",
+    "wysiwyg"
+  ],
+  "homepage": "https://github.com/Bacher/codemirror-md",
+  "main": "src/js/editor.js",
+  "license": "MIT",
+  "author": {
+    "name": "Ilya Lebedev",
+    "email": "bacherko@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/Bacher/codemirror-md/issues"
+  },
+  "dependencies": {
+    "codemirror": "^5.40.2",
+    "marked": "^0.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bacher/codemirror-md"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4,
+    "semi": true,
+    "trailingComma": "es5",
+    "printWidth": 100,
+    "overrides": [
+      {
+        "files": [
+          "*.json",
+          "*.scss"
+        ],
+        "options": {
+          "tabWidth": 2
+        }
+      }
+    ]
+  }
+}
