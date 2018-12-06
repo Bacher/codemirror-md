@@ -524,7 +524,7 @@ function toggleCodeBlock(editor) {
                 line = cm.getLineHandle(block_start);
                 if (line.text.match(/^\s*$/)) {
                     // empty or all whitespace - keep going
-                    continue;
+                    // do nothing
                 } else {
                     if (code_type(cm, block_start, line) !== 'indented') {
                         block_start += 1;
@@ -862,17 +862,17 @@ function _toggleHeading(cm, direction, size) {
 
             if (direction !== undefined) {
                 if (currHeadingLevel <= 0) {
-                    if (direction == 'bigger') {
+                    if (direction === 'bigger') {
                         text = '###### ' + text;
                     } else {
                         text = '# ' + text;
                     }
-                } else if (currHeadingLevel == 6 && direction == 'smaller') {
+                } else if (currHeadingLevel == 6 && direction === 'smaller') {
                     text = text.substr(7);
-                } else if (currHeadingLevel == 1 && direction == 'bigger') {
+                } else if (currHeadingLevel == 1 && direction === 'bigger') {
                     text = text.substr(2);
                 } else {
-                    if (direction == 'bigger') {
+                    if (direction === 'bigger') {
                         text = text.substr(1);
                     } else {
                         text = '#' + text;
@@ -929,7 +929,7 @@ function _toggleLine(cm, name) {
     var startPoint = cm.getCursor('start');
     var endPoint = cm.getCursor('end');
     var repl = {
-        quote: /^(\s*)\>\s+/,
+        quote: /^(\s*)>\s+/,
         'unordered-list': /^(\s*)(\*|\-|\+)\s+/,
         'ordered-list': /^(\s*)\d+\.\s+/,
     };
@@ -981,13 +981,13 @@ function _toggleBlock(editor, type, start_chars, end_chars) {
         text = cm.getLine(startPoint.line);
         start = text.slice(0, startPoint.ch);
         end = text.slice(startPoint.ch);
-        if (type == 'bold') {
+        if (type === 'bold') {
             start = start.replace(/(\*\*|__)(?![\s\S]*(\*\*|__))/, '');
             end = end.replace(/(\*\*|__)/, '');
-        } else if (type == 'italic') {
+        } else if (type === 'italic') {
             start = start.replace(/(\*|_)(?![\s\S]*(\*|_))/, '');
             end = end.replace(/(\*|_)/, '');
-        } else if (type == 'strikethrough') {
+        } else if (type === 'strikethrough') {
             start = start.replace(/(\*\*|~~)(?![\s\S]*(\*\*|~~))/, '');
             end = end.replace(/(\*\*|~~)/, '');
         }
@@ -1003,12 +1003,12 @@ function _toggleBlock(editor, type, start_chars, end_chars) {
             }
         );
 
-        if (type == 'bold' || type == 'strikethrough') {
+        if (type === 'bold' || type === 'strikethrough') {
             startPoint.ch -= 2;
             if (startPoint !== endPoint) {
                 endPoint.ch -= 2;
             }
-        } else if (type == 'italic') {
+        } else if (type === 'italic') {
             startPoint.ch -= 1;
             if (startPoint !== endPoint) {
                 endPoint.ch -= 1;
@@ -1016,13 +1016,13 @@ function _toggleBlock(editor, type, start_chars, end_chars) {
         }
     } else {
         text = cm.getSelection();
-        if (type == 'bold') {
+        if (type === 'bold') {
             text = text.split('**').join('');
             text = text.split('__').join('');
-        } else if (type == 'italic') {
+        } else if (type === 'italic') {
             text = text.split('*').join('');
             text = text.split('_').join('');
-        } else if (type == 'strikethrough') {
+        } else if (type === 'strikethrough') {
             text = text.split('~~').join('');
         }
         cm.replaceSelection(start + text + end);
@@ -1355,7 +1355,7 @@ function Editor(options) {
         // Loop over the built in buttons, to get the preferred order
         for (var key in toolbarBuiltInButtons) {
             if (toolbarBuiltInButtons.hasOwnProperty(key)) {
-                if (key.indexOf('separator-') != -1) {
+                if (key.indexOf('separator-') !== -1) {
                     options.toolbar.push('|');
                 }
 
@@ -1363,7 +1363,7 @@ function Editor(options) {
                     toolbarBuiltInButtons[key].default === true ||
                     (options.showIcons &&
                         options.showIcons.constructor === Array &&
-                        options.showIcons.indexOf(key) != -1)
+                        options.showIcons.indexOf(key) !== -1)
                 ) {
                     options.toolbar.push(key);
                 }
@@ -1427,15 +1427,11 @@ Editor.prototype.markdown = function(text) {
         var markedOptions = {};
 
         // Update options
-        if (
+        markedOptions.breaks = !(
             this.options &&
             this.options.renderingConfig &&
             this.options.renderingConfig.singleLineBreaks === false
-        ) {
-            markedOptions.breaks = false;
-        } else {
-            markedOptions.breaks = true;
-        }
+        );
 
         if (
             this.options &&
@@ -1498,7 +1494,7 @@ Editor.prototype.render = function(el) {
         function(e) {
             e = e || window.event;
 
-            if (e.keyCode == 27) {
+            if (e.keyCode === 27) {
                 if (self.codemirror.getOption('fullScreen')) toggleFullScreen(self);
             }
         },
@@ -1516,11 +1512,11 @@ Editor.prototype.render = function(el) {
         theme: 'paper',
         tabSize: options.tabSize != undefined ? options.tabSize : 2,
         indentUnit: options.tabSize != undefined ? options.tabSize : 2,
-        indentWithTabs: options.indentWithTabs === false ? false : true,
+        indentWithTabs: options.indentWithTabs !== false,
         lineNumbers: false,
-        autofocus: options.autofocus === true ? true : false,
+        autofocus: options.autofocus === true,
         extraKeys: keyMaps,
-        lineWrapping: options.lineWrapping === false ? false : true,
+        lineWrapping: options.lineWrapping !== false,
         allowDropFileTypes: ['text/plain'],
         placeholder: options.placeholder || el.getAttribute('placeholder') || '',
         styleSelectedText:
@@ -1556,22 +1552,6 @@ Editor.prototype.render = function(el) {
         0
     );
 };
-
-// Safari, in Private Browsing Mode, looks like it supports localStorage but all calls to setItem throw QuotaExceededError. We're going to detect this and set a variable accordingly.
-function isLocalStorageAvailable() {
-    if (typeof localStorage === 'object') {
-        try {
-            localStorage.setItem('smde_localStorage', 1);
-            localStorage.removeItem('smde_localStorage');
-        } catch (e) {
-            return false;
-        }
-    } else {
-        return false;
-    }
-
-    return true;
-}
 
 Editor.prototype.createSideBySide = function() {
     var cm = this.codemirror;
@@ -1636,13 +1616,14 @@ Editor.prototype.createToolbar = function(items) {
     self.toolbar = items;
 
     for (i = 0; i < items.length; i++) {
-        if (items[i].name == 'guide' && self.options.toolbarGuideIcon === false) continue;
+        if (items[i].name === 'guide' && self.options.toolbarGuideIcon === false) continue;
 
-        if (self.options.hideIcons && self.options.hideIcons.indexOf(items[i].name) != -1) continue;
+        if (self.options.hideIcons && self.options.hideIcons.indexOf(items[i].name) !== -1)
+            continue;
 
         // Fullscreen does not work well on mobile devices (even tablets)
         // In the future, hopefully this can be resolved
-        if ((items[i].name == 'fullscreen' || items[i].name == 'side-by-side') && isMobile())
+        if ((items[i].name === 'fullscreen' || items[i].name === 'side-by-side') && isMobile())
             continue;
 
         // Don't include trailing separators
@@ -1652,7 +1633,8 @@ Editor.prototype.createToolbar = function(items) {
             for (var x = i + 1; x < items.length; x++) {
                 if (
                     items[x] !== '|' &&
-                    (!self.options.hideIcons || self.options.hideIcons.indexOf(items[x].name) == -1)
+                    (!self.options.hideIcons ||
+                        self.options.hideIcons.indexOf(items[x].name) === -1)
                 ) {
                     nonSeparatorIconsFollow = true;
                 }
@@ -1699,7 +1681,7 @@ Editor.prototype.createToolbar = function(items) {
                 var el = toolbarData[key];
                 if (stat[key]) {
                     el.className += ' active';
-                } else if (key != 'fullscreen' && key != 'side-by-side') {
+                } else if (key !== 'fullscreen' && key !== 'side-by-side') {
                     el.className = el.className.replace(/\s*active\s*/g, '');
                 }
             })(key);
